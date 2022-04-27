@@ -57,4 +57,4 @@ namespace map_renderer {
         svg::Point CoordinateCalculation(geo::Coordinates coordinate);
         void FillText(PointType point_type, TextType text_type, svg::Text& text_svg, svg::Point stop_coordinate, std::string data);
     };
-} // конец пространства имен map_renderer
+} // РєРѕРЅРµС† РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјРµРЅ map_renderer
