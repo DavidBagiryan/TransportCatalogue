@@ -35,4 +35,4 @@ namespace json_reader {
 
         void ResultPrint();
     };
-} // конец пространства имен json_reader
+} // РєРѕРЅРµС† РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјРµРЅ json_reader
