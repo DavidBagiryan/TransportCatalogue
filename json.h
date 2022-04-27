@@ -13,7 +13,7 @@ namespace json {
 	using Array = std::vector<Node>;
 	using Variable = std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string>;
 
-	// Эта ошибка должна выбрасываться при ошибках парсинга JSON
+	// Р­С‚Р° РѕС€РёР±РєР° РґРѕР»Р¶РЅР° РІС‹Р±СЂР°СЃС‹РІР°С‚СЊСЃСЏ РїСЂРё РѕС€РёР±РєР°С… РїР°СЂСЃРёРЅРіР° JSON
 	class ParsingError : public std::runtime_error {
 	public:
 		using runtime_error::runtime_error;
