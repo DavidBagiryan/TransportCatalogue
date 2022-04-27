@@ -20,13 +20,13 @@ namespace map_renderer {
     };
 
     enum class PointType {
-        ROUTE, 
-        STOP 
+        ROUTE,
+        STOP
     };
 
     enum class TextType {
-        SUBSTRATE, 
-        NAME 
+        SUBSTRATE,
+        NAME
     };
 
     class MapRender {
@@ -57,4 +57,4 @@ namespace map_renderer {
         svg::Point CoordinateCalculation(geo::Coordinates coordinate);
         void FillText(PointType point_type, TextType text_type, svg::Text& text_svg, svg::Point stop_coordinate, std::string data);
     };
-} // РєРѕРЅРµС† РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјРµРЅ map_renderer
+} // конец пространства имен map_renderer

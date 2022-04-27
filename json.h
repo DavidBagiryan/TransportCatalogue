@@ -13,22 +13,15 @@ namespace json {
 	using Array = std::vector<Node>;
 	using Variable = std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string>;
 
-	// Р­С‚Р° РѕС€РёР±РєР° РґРѕР»Р¶РЅР° РІС‹Р±СЂР°СЃС‹РІР°С‚СЊСЃСЏ РїСЂРё РѕС€РёР±РєР°С… РїР°СЂСЃРёРЅРіР° JSON
+	// Эта ошибка должна выбрасываться при ошибках парсинга JSON
 	class ParsingError : public std::runtime_error {
 	public:
 		using runtime_error::runtime_error;
 	};
 
-	class Node {
+	class Node : private Variable {
 	public:
-		Node() = default;
-		Node(std::nullptr_t) { node_ = {}; }
-		Node(Array array) :node_(std::move(array)) {}
-		Node(Dict dictonary) :node_(std::move(dictonary)) {}
-		Node(bool value) :node_(std::move(value)) {}
-		Node(int value) :node_(std::move(value)) {}
-		Node(double value) :node_(std::move(value)) {}
-		Node(std::string str) :node_(std::move(str)) {}
+		using variant::variant;
 
 		bool IsNull() const;
 		bool IsInt() const;
@@ -45,18 +38,10 @@ namespace json {
 		const int& AsInt() const;
 		const Dict& AsMap() const;
 		const std::string& AsString() const;
-		const Variable& GetNode() const { return node_; }
+		const Variable& GetNode() const { return *this; }
 
-		inline bool operator==(const Node& right) const {
-			return node_ == right.node_;
-		}
-
-		inline bool operator!=(const Node& right) const {
-			return node_ != right.node_;
-		}
-
-	private:
-		Variable node_;
+		bool operator==(const Node& right) const;
+		bool operator!=(const Node& right) const;
 	};
 
 	class Document {
@@ -65,13 +50,8 @@ namespace json {
 
 		const Node& GetRoot() const;
 
-		inline bool operator==(const Document& right) const {
-			return root_ == right.root_;
-		}
-
-		inline bool operator!=(const Document& right) const {
-			return root_ != right.root_;
-		}
+		bool operator==(const Document& right) const;
+		bool operator!=(const Document& right) const;
 
 	private:
 		Node root_;

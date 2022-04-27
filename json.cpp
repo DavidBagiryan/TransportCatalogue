@@ -78,7 +78,7 @@ namespace json {
 
             std::string parsed_num;
 
-            // РЎС‡РёС‚С‹РІР°РµС‚ РІ parsed_num РѕС‡РµСЂРµРґРЅРѕР№ СЃРёРјРІРѕР» РёР· input
+            // Считывает в parsed_num очередной символ из input
             auto read_char = [&parsed_num, &input] {
                 parsed_num += static_cast<char>(input.get());
                 if (!input) {
@@ -86,7 +86,7 @@ namespace json {
                 }
             };
 
-            // РЎС‡РёС‚С‹РІР°РµС‚ РѕРґРЅСѓ РёР»Рё Р±РѕР»РµРµ С†РёС„СЂ РІ parsed_num РёР· input
+            // Считывает одну или более цифр в parsed_num из input
             auto read_digits = [&input, read_char] {
                 if (!std::isdigit(input.peek())) {
                     throw ParsingError("A digit is expected"s);
@@ -99,24 +99,24 @@ namespace json {
             if (input.peek() == '-') {
                 read_char();
             }
-            // РџР°СЂСЃРёРј С†РµР»СѓСЋ С‡Р°СЃС‚СЊ С‡РёСЃР»Р°
+            // Парсим целую часть числа
             if (input.peek() == '0') {
                 read_char();
-                // РџРѕСЃР»Рµ 0 РІ JSON РЅРµ РјРѕРіСѓС‚ РёРґС‚Рё РґСЂСѓРіРёРµ С†РёС„СЂС‹
+                // После 0 в JSON не могут идти другие цифры
             }
             else {
                 read_digits();
             }
 
             bool is_int = true;
-            // РџР°СЂСЃРёРј РґСЂРѕР±РЅСѓСЋ С‡Р°СЃС‚СЊ С‡РёСЃР»Р°
+            // Парсим дробную часть числа
             if (input.peek() == '.') {
                 read_char();
                 read_digits();
                 is_int = false;
             }
 
-            // РџР°СЂСЃРёРј СЌРєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅСѓСЋ С‡Р°СЃС‚СЊ С‡РёСЃР»Р°
+            // Парсим экспоненциальную часть числа
             if (int ch = input.peek(); ch == 'e' || ch == 'E') {
                 read_char();
                 if (ch = input.peek(); ch == '+' || ch == '-') {
@@ -128,13 +128,13 @@ namespace json {
 
             try {
                 if (is_int) {
-                    // РЎРЅР°С‡Р°Р»Р° РїСЂРѕР±СѓРµРј РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ СЃС‚СЂРѕРєСѓ РІ int
+                    // Сначала пробуем преобразовать строку в int
                     try {
                         return std::stoi(parsed_num);
                     }
                     catch (...) {
-                        // Р’ СЃР»СѓС‡Р°Рµ РЅРµСѓРґР°С‡Рё, РЅР°РїСЂРёРјРµСЂ, РїСЂРё РїРµСЂРµРїРѕР»РЅРµРЅРёРё,
-                        // РєРѕРґ РЅРёР¶Рµ РїРѕРїСЂРѕР±СѓРµС‚ РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ СЃС‚СЂРѕРєСѓ РІ double
+                        // В случае неудачи, например, при переполнении,
+                        // код ниже попробует преобразовать строку в double
                     }
                 }
                 return std::stod(parsed_num);
@@ -346,6 +346,22 @@ namespace json {
             output << '}' << endl;
             return;
         }
+    }
+
+    bool Node::operator==(const Node& right) const {
+        return GetNode() == right.GetNode();
+    }
+
+    bool Node::operator!=(const Node& right) const {
+        return GetNode() != right.GetNode();
+    }
+
+    bool Document::operator==(const Document& right) const {
+        return root_ == right.root_;
+    }
+
+    bool Document::operator!=(const Document& right) const {
+        return root_ != right.root_;
     }
 
 }  // namespace json

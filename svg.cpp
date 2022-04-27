@@ -32,7 +32,7 @@ namespace svg {
     void Object::Render(const RenderContext& context) const {
         context.RenderIndent();
 
-        // Р”РµР»РµРіРёСЂСѓРµРј РІС‹РІРѕРґ С‚РµРіР° СЃРІРѕРёРј РїРѕРґРєР»Р°СЃСЃР°Рј
+        // Делегируем вывод тега своим подклассам
         RenderObject(context);
 
         context.out << std::endl;
@@ -54,7 +54,7 @@ namespace svg {
         auto& out = context.out;
         out << "<circle cx=\""sv << center_.x << "\" cy=\""sv << center_.y << "\" "sv;
         out << "r=\""sv << radius_ << "\""sv;
-        // Р’С‹РІРѕРґРёРј Р°С‚СЂРёР±СѓС‚С‹, СѓРЅР°СЃР»РµРґРѕРІР°РЅРЅС‹Рµ РѕС‚ PathProps
+        // Выводим атрибуты, унаследованные от PathProps
         RenderAttrs(context.out);
         out << "/>"sv;
     }
@@ -99,7 +99,7 @@ namespace svg {
         if (font_family_ != "") out << "font-family=\""sv << font_family_ << "\""sv;
         if (font_family_ != "" && font_weight_ != "") out << " "sv;
         if (font_weight_ != "") out << "font-weight=\""sv << font_weight_ << "\""sv;
-        // Р’С‹РІРѕРґРёРј Р°С‚СЂРёР±СѓС‚С‹, СѓРЅР°СЃР»РµРґРѕРІР°РЅРЅС‹Рµ РѕС‚ PathProps
+        // Выводим атрибуты, унаследованные от PathProps
         RenderAttrs(context.out);
         out << ">"sv;
         out << Metamorphosis() << "</text>"sv;
@@ -154,7 +154,7 @@ namespace svg {
                 out << " ";
             }
         }
-        // Р’С‹РІРѕРґРёРј Р°С‚СЂРёР±СѓС‚С‹, СѓРЅР°СЃР»РµРґРѕРІР°РЅРЅС‹Рµ РѕС‚ PathProps
+        // Выводим атрибуты, унаследованные от PathProps
         RenderAttrs(context.out);
         out << " />"sv;
     }

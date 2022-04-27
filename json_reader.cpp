@@ -1,10 +1,5 @@
 #include "json_reader.h"
 
-/*
- * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
- * а также код обработки запросов к базе и формирование массива ответов в формате JSON
- */
-
 using namespace transport_catalogue;
 using namespace json_reader;
 using namespace map_renderer;
@@ -34,8 +29,8 @@ void JsonReader::Reader() {
             .MapRendering(map_svg);
     }
 
-    ProcessingRequest(content_state, map_svg);
-    PrintResult();
+    ProcessRequest(content_state, map_svg);
+    ResultPrint();
 }
 
 ////////// base_requests //////////
@@ -99,81 +94,23 @@ void JsonReader::AddBus(const Dict& bus) {
 //-------- base_requests //--------
 
 ////////// stat_requests //////////
-void JsonReader::ProcessingRequest(Array& value, svg::Document& map_svg) {
+void JsonReader::ProcessRequest(Array& value, svg::Document& map_svg) {
+    request_handler::RequestHandler request_handler(catalog_, map_catalog_);
+
     for (auto& description : value) {
         if (description.AsMap().at("type"s) == "Stop"s) {
-            StopInformationPrinting(description.AsMap());
+            print_.emplace_back(request_handler.StopInfoPrint(description.AsMap()));
         }
         else if (description.AsMap().at("type"s) == "Bus"s) {
-            BusInformationPrinting(description.AsMap());
+            print_.emplace_back(request_handler.BusInfoPrint(description.AsMap()));
         }
         else if (description.AsMap().at("type"s) == "Map"s) {
-            MapPrinting(description.AsMap(), map_svg);
+            print_.emplace_back(request_handler.MapPrint(description.AsMap().at("id"s).AsInt(), map_svg));
         }
     }
 }
 
-void JsonReader::StopInformationPrinting(const Dict& value) {
-    int id;
-    std::string name;
-    Array bus_names;
-
-    id = value.at("id"s).AsInt();
-    name = value.at("name"s).AsString();
-
-    std::set<std::string_view> buses;
-
-    if (catalog_.FindStop(name).name_ == "Error"s) {
-        print_.emplace_back(Dict{ {"request_id"s, id}, {"error_message"s, "not found"s} });
-    }
-    else {
-        try {
-            buses = catalog_.GetBusesToStops().at(name);
-            for (auto& bus : buses) {
-                bus_names.push_back(std::string(bus));
-            }
-        }
-        catch (...) {}
-        print_.emplace_back(Dict{ {"buses"s, bus_names}, {"request_id"s, id} });
-    }
-
-}
-
-void JsonReader::BusInformationPrinting(const Dict& value) {
-    std::string name;
-    double curvature;
-    int id;
-    double route_length;
-    size_t stop_count;
-    size_t unique_stop_count;
-
-    name = value.at("name"s).AsString();
-    id = value.at("id"s).AsInt();
-
-    Bus route = catalog_.FindBus(name);
-    if (route.name_ == "Error"s) {
-        print_.emplace_back(Dict{ {"request_id"s, id}, {"error_message"s, "not found"s} });
-    }
-    else {
-        BusInfo info = catalog_.GetBusInfo(value.at("name"s).AsString());
-        curvature = info.curvature_;
-        route_length = info.real_distance_length_;
-        stop_count = info.stops_num_;
-        unique_stop_count = info.unique_stops_num_;
-        print_.emplace_back(Dict{ {"curvature"s, curvature}, {"request_id"s, id}, {"route_length"s, route_length}, {"stop_count"s, int(stop_count)}, {"unique_stop_count"s, int(unique_stop_count)} });
-    }
-}
-
-void JsonReader::MapPrinting(const Dict& value, svg::Document& map_svg) {
-    int id = value.at("id"s).AsInt();
-
-    std::ostringstream svg;
-    map_svg.Render(svg);
-
-    print_.emplace_back(Dict{ {"map"s, svg.str()}, {"request_id"s, id} });
-}
-
-void JsonReader::PrintResult() {
+void JsonReader::ResultPrint() {
     Print(Document{ print_ }, output_);
 }
 
@@ -211,15 +148,15 @@ const svg::Color JsonReader::GetColor(const Node& color) {
     }
     else if (color.IsArray()) {
         if (color.AsArray().size() == 3) {
-            return svg::Rgb{static_cast<uint8_t>(color.AsArray()[0].AsInt()),
+            return svg::Rgb{ static_cast<uint8_t>(color.AsArray()[0].AsInt()),
                             static_cast<uint8_t>(color.AsArray()[1].AsInt()),
-                            static_cast<uint8_t>(color.AsArray()[2].AsInt())};
+                            static_cast<uint8_t>(color.AsArray()[2].AsInt()) };
         }
         else if (color.AsArray().size() == 4) {
-            return svg::Rgba{static_cast<uint8_t>(color.AsArray()[0].AsInt()),
+            return svg::Rgba{ static_cast<uint8_t>(color.AsArray()[0].AsInt()),
                              static_cast<uint8_t>(color.AsArray()[1].AsInt()),
                              static_cast<uint8_t>(color.AsArray()[2].AsInt()),
-                             color.AsArray()[3].AsDouble()};
+                             color.AsArray()[3].AsDouble() };
         }
     }
     return svg::Color();

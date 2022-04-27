@@ -1,9 +1,6 @@
 #pragma once
 
-#include "json.h"
-#include "map_renderer.h"
-
-#include <sstream>
+#include "request_handler.h"
 
 namespace json_reader {
     class JsonReader {
@@ -30,15 +27,12 @@ namespace json_reader {
         void AddBus(const json::Dict& bus);
 
         ////////// stat_requests //////////
-        void ProcessingRequest(json::Array& value, svg::Document& map_svg);
-        void StopInformationPrinting(const json::Dict& value);
-        void BusInformationPrinting(const json::Dict& value);
+        void ProcessRequest(json::Array& value, svg::Document& map_svg);
 
         ////////// render_settings //////////
         map_renderer::RenderSettings SetSettingsMap(json::Dict& render_settings);
         const svg::Color GetColor(const json::Node& color);
 
-        void PrintResult();
-        void MapPrinting(const json::Dict& value, svg::Document& map_svg);
+        void ResultPrint();
     };
-} // РєРѕРЅРµС† РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјРµРЅ json_reader
+} // конец пространства имен json_reader
