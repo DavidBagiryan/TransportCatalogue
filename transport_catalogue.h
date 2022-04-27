@@ -9,63 +9,63 @@
 namespace transport_catalogue {
 	using namespace domain;
 
-	// класс каталога маршрутов
+	// РєР»Р°СЃСЃ РєР°С‚Р°Р»РѕРіР° РјР°СЂС€СЂСѓС‚РѕРІ
 	class TransportCatalogue {
 	public:
-		// хешер пары остановок
+		// С…РµС€РµСЂ РїР°СЂС‹ РѕСЃС‚Р°РЅРѕРІРѕРє
 		struct StopsHasher {
 			size_t operator()(const std::pair<const Stop*, const Stop*>& two_stops) const;
 		private:
 			std::hash<const void*> hasher_;
 		};
 
-		// добавление остановки
+		// РґРѕР±Р°РІР»РµРЅРёРµ РѕСЃС‚Р°РЅРѕРІРєРё
 		void AddStop(std::string name, Coordinates point);
-		// добавление маршрута
+		// РґРѕР±Р°РІР»РµРЅРёРµ РјР°СЂС€СЂСѓС‚Р°
 		void AddBus(std::string name, std::vector<const Stop*> stops_of_bus, RouteType loop);
 
-		// поиск остановки по имени
+		// РїРѕРёСЃРє РѕСЃС‚Р°РЅРѕРІРєРё РїРѕ РёРјРµРЅРё
 		const Stop& FindStop(const std::string& name);
-		// поиск маршрута по номеру
+		// РїРѕРёСЃРє РјР°СЂС€СЂСѓС‚Р° РїРѕ РЅРѕРјРµСЂСѓ
 		const Bus& FindBus(const std::string& name);
-		// поиск информации о маршруте по номеру
+		// РїРѕРёСЃРє РёРЅС„РѕСЂРјР°С†РёРё Рѕ РјР°СЂС€СЂСѓС‚Рµ РїРѕ РЅРѕРјРµСЂСѓ
 		BusInfo GetBusInfo(const std::string& name);
 
-		// получение всех маршрутов с их остановками
+		// РїРѕР»СѓС‡РµРЅРёРµ РІСЃРµС… РјР°СЂС€СЂСѓС‚РѕРІ СЃ РёС… РѕСЃС‚Р°РЅРѕРІРєР°РјРё
 		std::unordered_map<std::string_view, std::set<std::string_view>>& GetBusesToStops();
-		// получение информации о дистанции между остановками
+		// РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРёСЃС‚Р°РЅС†РёРё РјРµР¶РґСѓ РѕСЃС‚Р°РЅРѕРІРєР°РјРё
 		double GetDistanceBetweenStops(std::string stop_name, std::string next_stop_name);
 		double GetDistanceBetweenStops(const Stop* stop, const Stop* next_stop);
 
-		// получение доступа к маршрутам
+		// РїРѕР»СѓС‡РµРЅРёРµ РґРѕСЃС‚СѓРїР° Рє РјР°СЂС€СЂСѓС‚Р°Рј
 		const std::deque<const Bus*> GetBuses() const;
-		// получение координат каждой остановки из маршрутов
+		// РїРѕР»СѓС‡РµРЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ РєР°Р¶РґРѕР№ РѕСЃС‚Р°РЅРѕРІРєРё РёР· РјР°СЂС€СЂСѓС‚РѕРІ
 		const std::vector<Coordinates> GetAllStopsCoordinates() const;
 
-		// заполнение информации о дистанции между остановками
+		// Р·Р°РїРѕР»РЅРµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРёСЃС‚Р°РЅС†РёРё РјРµР¶РґСѓ РѕСЃС‚Р°РЅРѕРІРєР°РјРё
 		void SetDistanceBetweenStops(std::string stop_name, std::string next_stop_name, double distance);
 
 	private:
-		// хранилища:
-		// остановок
+		// С…СЂР°РЅРёР»РёС‰Р°:
+		// РѕСЃС‚Р°РЅРѕРІРѕРє
 		std::deque<Stop> stops_;
-		// маршрутов
+		// РјР°СЂС€СЂСѓС‚РѕРІ
 		std::deque<Bus> buses_;
-		// маршрутов с их остановками
+		// РјР°СЂС€СЂСѓС‚РѕРІ СЃ РёС… РѕСЃС‚Р°РЅРѕРІРєР°РјРё
 		std::unordered_map<std::string_view, std::set<std::string_view>> buses_to_stops_;
-		// информации о дистанции между остановками из маршрутов
+		// РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРёСЃС‚Р°РЅС†РёРё РјРµР¶РґСѓ РѕСЃС‚Р°РЅРѕРІРєР°РјРё РёР· РјР°СЂС€СЂСѓС‚РѕРІ
 		std::unordered_map<const std::pair<const Stop*, const Stop*>, double, StopsHasher> stop_pair_to_distance_;
 
-		// подсчет коэффициента для работы с маршрутом
+		// РїРѕРґСЃС‡РµС‚ РєРѕСЌС„С„РёС†РёРµРЅС‚Р° РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РјР°СЂС€СЂСѓС‚РѕРј
 		double GetBusLoopCoeff(Bus& bus);
 
-		// подсчет кол-ва остановок
+		// РїРѕРґСЃС‡РµС‚ РєРѕР»-РІР° РѕСЃС‚Р°РЅРѕРІРѕРє
 		size_t GetBusLoopStopNum(Bus& bus);
 
-		// подсчет количества уникальных остановок
+		// РїРѕРґСЃС‡РµС‚ РєРѕР»РёС‡РµСЃС‚РІР° СѓРЅРёРєР°Р»СЊРЅС‹С… РѕСЃС‚Р°РЅРѕРІРѕРє
 		size_t GetBusInfoUniqueStops(std::vector<const Stop*> stops_of_bus);
 
-		// подсчет длины маршурута 
+		// РїРѕРґСЃС‡РµС‚ РґР»РёРЅС‹ РјР°СЂС€СѓСЂСѓС‚Р° 
 		std::pair<double, double> GetBusInfoLoopDistance(Bus& bus, double& looped_coeff);
 	};
-} // конец пространства имен transport_catalogue
+} // РєРѕРЅРµС† РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјРµРЅ transport_catalogue
