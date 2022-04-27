@@ -4,7 +4,7 @@
 
 using namespace transport_catalogue;
 
-// добавление остановки
+// РґРѕР±Р°РІР»РµРЅРёРµ РѕСЃС‚Р°РЅРѕРІРєРё
 void TransportCatalogue::AddStop(std::string name, Coordinates point) {
 	stops_.emplace_back(name, point);
 	buses_to_stops_[name];
@@ -16,7 +16,7 @@ size_t TransportCatalogue::StopsHasher::operator()(const std::pair<const Stop*, 
 	return h_2 * 42 + h_1 * (42 * 42);
 }
 
-// добавление маршрута
+// РґРѕР±Р°РІР»РµРЅРёРµ РјР°СЂС€СЂСѓС‚Р°
 void TransportCatalogue::AddBus(std::string name, std::vector<const Stop*> stops_of_bus, RouteType loop) {
 	buses_.emplace_back(name, stops_of_bus, loop );
 	const Bus* from_buses_ = &FindBus(name);
@@ -25,52 +25,52 @@ void TransportCatalogue::AddBus(std::string name, std::vector<const Stop*> stops
 	}
 }
 
-// поиск остановки по имени
+// РїРѕРёСЃРє РѕСЃС‚Р°РЅРѕРІРєРё РїРѕ РёРјРµРЅРё
 const Stop& TransportCatalogue::FindStop(const std::string& name) {
 	for (const Stop& stop : stops_) {
 		if (stop.name_ == name) {
 			return stop;
 		}
 	}
-	static Stop stop; // стандартное имя остановки
+	static Stop stop; // СЃС‚Р°РЅРґР°СЂС‚РЅРѕРµ РёРјСЏ РѕСЃС‚Р°РЅРѕРІРєРё
 	return stop;
 }
 
-// поиск маршрута по номеру
+// РїРѕРёСЃРє РјР°СЂС€СЂСѓС‚Р° РїРѕ РЅРѕРјРµСЂСѓ
 const Bus& TransportCatalogue::FindBus(const std::string& name) {
 	for (const Bus& bus : buses_) {
 		if (bus.name_ == name) {
 			return bus;
 		}
 	}
-	static Bus bus; // стандартный номер маршрута
+	static Bus bus; // СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РЅРѕРјРµСЂ РјР°СЂС€СЂСѓС‚Р°
 	return bus;
 }
 
-// поиск информации о маршруте по номеру
+// РїРѕРёСЃРє РёРЅС„РѕСЂРјР°С†РёРё Рѕ РјР°СЂС€СЂСѓС‚Рµ РїРѕ РЅРѕРјРµСЂСѓ
 BusInfo TransportCatalogue::GetBusInfo(const std::string& name) {
-	// хранилище информации о маршруте
+	// С…СЂР°РЅРёР»РёС‰Рµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РјР°СЂС€СЂСѓС‚Рµ
 	BusInfo info;
-	// находим общую информацию о маршруте (номер, остановки, тип[прямой/кольцевой])
+	// РЅР°С…РѕРґРёРј РѕР±С‰СѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РјР°СЂС€СЂСѓС‚Рµ (РЅРѕРјРµСЂ, РѕСЃС‚Р°РЅРѕРІРєРё, С‚РёРї[РїСЂСЏРјРѕР№/РєРѕР»СЊС†РµРІРѕР№])
 	Bus bus = FindBus(name);
-	// подсчет количества уникальных остановок
+	// РїРѕРґСЃС‡РµС‚ РєРѕР»РёС‡РµСЃС‚РІР° СѓРЅРёРєР°Р»СЊРЅС‹С… РѕСЃС‚Р°РЅРѕРІРѕРє
 	info.unique_stops_num_ = GetBusInfoUniqueStops(bus.stops_of_bus_);
-	// введем коэффициент для работы с маршрутом
+	// РІРІРµРґРµРј РєРѕСЌС„С„РёС†РёРµРЅС‚ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РјР°СЂС€СЂСѓС‚РѕРј
 	double looped_coeff = GetBusLoopCoeff(bus);
-	// подсчет кол-ва остановок
+	// РїРѕРґСЃС‡РµС‚ РєРѕР»-РІР° РѕСЃС‚Р°РЅРѕРІРѕРє
 	info.stops_num_ = GetBusLoopStopNum(bus);
-	// подсчет длины маршурута 
+	// РїРѕРґСЃС‡РµС‚ РґР»РёРЅС‹ РјР°СЂС€СѓСЂСѓС‚Р° 
 	std::pair<double, double> direct_distance_real_distance = GetBusInfoLoopDistance(bus, looped_coeff);
-	// заполняем прямую длину маршрута
+	// Р·Р°РїРѕР»РЅСЏРµРј РїСЂСЏРјСѓСЋ РґР»РёРЅСѓ РјР°СЂС€СЂСѓС‚Р°
 	info.distance_length_ = direct_distance_real_distance.first;
-	// заполняем фактическую длину маршрута
+	// Р·Р°РїРѕР»РЅСЏРµРј С„Р°РєС‚РёС‡РµСЃРєСѓСЋ РґР»РёРЅСѓ РјР°СЂС€СЂСѓС‚Р°
 	info.real_distance_length_ = direct_distance_real_distance.second;
-	// заполняем коэффициент извилистости
+	// Р·Р°РїРѕР»РЅСЏРµРј РєРѕСЌС„С„РёС†РёРµРЅС‚ РёР·РІРёР»РёСЃС‚РѕСЃС‚Рё
 	info.curvature_ = direct_distance_real_distance.second / direct_distance_real_distance.first;
 	return info;
 }
 
-// подсчет коэффициента для работы с маршрутом
+// РїРѕРґСЃС‡РµС‚ РєРѕСЌС„С„РёС†РёРµРЅС‚Р° РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РјР°СЂС€СЂСѓС‚РѕРј
 double TransportCatalogue::GetBusLoopCoeff(Bus& bus) {
 	double looped_coeff;
 	if (bus.loop_ == transport_catalogue::RouteType::IS_LOOPED) {
@@ -82,7 +82,7 @@ double TransportCatalogue::GetBusLoopCoeff(Bus& bus) {
 	return looped_coeff;
 }
 
-// подсчет кол-ва остановок
+// РїРѕРґСЃС‡РµС‚ РєРѕР»-РІР° РѕСЃС‚Р°РЅРѕРІРѕРє
 size_t TransportCatalogue::GetBusLoopStopNum(Bus& bus) {
 	size_t stops_num;
 	if (bus.loop_ == transport_catalogue::RouteType::IS_LOOPED) {
@@ -94,13 +94,13 @@ size_t TransportCatalogue::GetBusLoopStopNum(Bus& bus) {
 	return stops_num;
 }
 
-// подсчет длины маршурута 
+// РїРѕРґСЃС‡РµС‚ РґР»РёРЅС‹ РјР°СЂС€СѓСЂСѓС‚Р° 
 std::pair<double, double> TransportCatalogue::GetBusInfoLoopDistance(Bus& bus, double& looped_coeff) {
-	// хранилище длины маршрута
+	// С…СЂР°РЅРёР»РёС‰Рµ РґР»РёРЅС‹ РјР°СЂС€СЂСѓС‚Р°
 	double distance = 0;
-	// хранилище фактической длины маршрута
+	// С…СЂР°РЅРёР»РёС‰Рµ С„Р°РєС‚РёС‡РµСЃРєРѕР№ РґР»РёРЅС‹ РјР°СЂС€СЂСѓС‚Р°
 	double real_distance = 0;
-	// stop_it - итератор на остановку, i - порядковый номер остановки 
+	// stop_it - РёС‚РµСЂР°С‚РѕСЂ РЅР° РѕСЃС‚Р°РЅРѕРІРєСѓ, i - РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ РѕСЃС‚Р°РЅРѕРІРєРё 
 	for (auto [stop_it, i] = std::tuple(bus.stops_of_bus_.begin(), 0); ; ++i) {
 		if (i == int(bus.stops_of_bus_.size() - 1)) {
 			real_distance += looped_coeff;
@@ -115,7 +115,7 @@ std::pair<double, double> TransportCatalogue::GetBusInfoLoopDistance(Bus& bus, d
 		Stop to = **stop_it;
 		distance += ComputeDistance(from.coordinates_, to.coordinates_);
 		if (bus.loop_ == transport_catalogue::RouteType::IS_LOOPED) {
-			// заполняем кольцо маршрута
+			// Р·Р°РїРѕР»РЅСЏРµРј РєРѕР»СЊС†Рѕ РјР°СЂС€СЂСѓС‚Р°
 			if (stop_it == bus.stops_of_bus_.end() - 1) {
 				Stop loop_end = **bus.stops_of_bus_.begin();
 				distance += ComputeDistance(to.coordinates_, loop_end.coordinates_);
@@ -131,7 +131,7 @@ std::pair<double, double> TransportCatalogue::GetBusInfoLoopDistance(Bus& bus, d
 	return { distance, real_distance };
 }
 
-// подсчет количества уникальных остановок
+// РїРѕРґСЃС‡РµС‚ РєРѕР»РёС‡РµСЃС‚РІР° СѓРЅРёРєР°Р»СЊРЅС‹С… РѕСЃС‚Р°РЅРѕРІРѕРє
 size_t TransportCatalogue::GetBusInfoUniqueStops(std::vector<const Stop*> stops_of_bus) {
 	size_t unique_stops;
 	std::sort(stops_of_bus.begin(), stops_of_bus.end());
@@ -140,12 +140,12 @@ size_t TransportCatalogue::GetBusInfoUniqueStops(std::vector<const Stop*> stops_
 	return unique_stops;
 }
 
-// получение всех маршрутов с их остановками
+// РїРѕР»СѓС‡РµРЅРёРµ РІСЃРµС… РјР°СЂС€СЂСѓС‚РѕРІ СЃ РёС… РѕСЃС‚Р°РЅРѕРІРєР°РјРё
 std::unordered_map<std::string_view, std::set<std::string_view>>& TransportCatalogue::GetBusesToStops() {
 	return buses_to_stops_;
 }
 
-// получение информации о дистанции между остановками
+// РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРёСЃС‚Р°РЅС†РёРё РјРµР¶РґСѓ РѕСЃС‚Р°РЅРѕРІРєР°РјРё
 double TransportCatalogue::GetDistanceBetweenStops(std::string stop_name, std::string next_stop_name) {
 	return GetDistanceBetweenStops(&FindStop(stop_name), &FindStop(next_stop_name));
 }
@@ -164,7 +164,7 @@ double TransportCatalogue::GetDistanceBetweenStops(const Stop* stop, const Stop*
 	return result;
 }
 
-// получение доступа к маршрутам
+// РїРѕР»СѓС‡РµРЅРёРµ РґРѕСЃС‚СѓРїР° Рє РјР°СЂС€СЂСѓС‚Р°Рј
 const std::deque<const Bus*> TransportCatalogue::GetBuses() const {
 	std::deque<const Bus*> buses;
 	for (const auto& bus : buses_) {
@@ -179,7 +179,7 @@ const std::deque<const Bus*> TransportCatalogue::GetBuses() const {
 	return buses;
 }
 
-// получение координат каждой остановки из маршрутов
+// РїРѕР»СѓС‡РµРЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ РєР°Р¶РґРѕР№ РѕСЃС‚Р°РЅРѕРІРєРё РёР· РјР°СЂС€СЂСѓС‚РѕРІ
 const std::vector<Coordinates> TransportCatalogue::GetAllStopsCoordinates() const {
 	std::vector<Coordinates> stops_coordinates;
 	for (const auto& bus : buses_) {
@@ -190,7 +190,7 @@ const std::vector<Coordinates> TransportCatalogue::GetAllStopsCoordinates() cons
 	return stops_coordinates;
 }
 
-// заполнение информации о дистанции между остановками
+// Р·Р°РїРѕР»РЅРµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРёСЃС‚Р°РЅС†РёРё РјРµР¶РґСѓ РѕСЃС‚Р°РЅРѕРІРєР°РјРё
 void TransportCatalogue::SetDistanceBetweenStops(std::string stop_name, std::string next_stop_name, double distance) {
 	const Stop* stop = &FindStop(stop_name);
 	const Stop* next_stop = &FindStop(next_stop_name);
