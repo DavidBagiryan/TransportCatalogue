@@ -5,12 +5,12 @@
 
 #include <sstream>
 
- // Класс RequestHandler играет роль Фасада, упрощающего взаимодействие JSON reader-а 
- // с другими подсистемами приложения. 
+ // РљР»Р°СЃСЃ RequestHandler РёРіСЂР°РµС‚ СЂРѕР»СЊ Р¤Р°СЃР°РґР°, СѓРїСЂРѕС‰Р°СЋС‰РµРіРѕ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ JSON reader-Р° 
+ // СЃ РґСЂСѓРіРёРјРё РїРѕРґСЃРёСЃС‚РµРјР°РјРё РїСЂРёР»РѕР¶РµРЅРёСЏ. 
 
 ////////// stat_requests //////////
 namespace request_handler {
-    // играет роль Фасада, упрощающего взаимодействие JSON reader-а 
+    // РёРіСЂР°РµС‚ СЂРѕР»СЊ Р¤Р°СЃР°РґР°, СѓРїСЂРѕС‰Р°СЋС‰РµРіРѕ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ JSON reader-Р° 
     class RequestHandler {
     public:
         RequestHandler(const transport_catalogue::TransportCatalogue& catalog, const map_renderer::MapRender& map_catalog);
@@ -23,4 +23,4 @@ namespace request_handler {
         transport_catalogue::TransportCatalogue catalog_;
         map_renderer::MapRender map_catalog_;
     };
-} // конец пространства имен request_handler
+} // РєРѕРЅРµС† РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјРµРЅ request_handler
