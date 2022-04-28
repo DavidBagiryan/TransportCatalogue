@@ -11,6 +11,20 @@ RequestHandler::RequestHandler(const transport_catalogue::TransportCatalogue& ca
 {
 }
 
+void RequestHandler::RequestProcess(json::Array& value, svg::Document& map_svg, json::Array& print) {
+    for (auto& description : value) {
+        if (description.AsMap().at("type"s) == "Stop"s) {
+            print.emplace_back(StopInfoPrint(description.AsMap()));
+        }
+        else if (description.AsMap().at("type"s) == "Bus"s) {
+            print.emplace_back(BusInfoPrint(description.AsMap()));
+        }
+        else if (description.AsMap().at("type"s) == "Map"s) {
+            print.emplace_back(MapPrint(description.AsMap().at("id"s).AsInt(), map_svg));
+        }
+    }
+}
+
 Dict RequestHandler::StopInfoPrint(const Dict& value) {
     int id;
     std::string name;

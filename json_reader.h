@@ -26,9 +26,6 @@ namespace json_reader {
         void AddStop(const json::Dict& stop);
         void AddBus(const json::Dict& bus);
 
-        ////////// stat_requests //////////
-        void ProcessRequest(json::Array& value, svg::Document& map_svg);
-
         ////////// render_settings //////////
         map_renderer::RenderSettings SetSettingsMap(json::Dict& render_settings);
         const svg::Color GetColor(const json::Node& color);

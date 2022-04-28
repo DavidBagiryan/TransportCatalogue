@@ -29,7 +29,8 @@ void JsonReader::Reader() {
             .MapRendering(map_svg);
     }
 
-    ProcessRequest(content_state, map_svg);
+    request_handler::RequestHandler processing(catalog_, map_catalog_);
+    processing.RequestProcess(content_state, map_svg, print_);
     ResultPrint();
 }
 
@@ -92,23 +93,6 @@ void JsonReader::AddBus(const Dict& bus) {
     catalog_.AddBus(name, stops, is_roundtrip);
 }
 //-------- base_requests //--------
-
-////////// stat_requests //////////
-void JsonReader::ProcessRequest(Array& value, svg::Document& map_svg) {
-    request_handler::RequestHandler request_handler(catalog_, map_catalog_);
-
-    for (auto& description : value) {
-        if (description.AsMap().at("type"s) == "Stop"s) {
-            print_.emplace_back(request_handler.StopInfoPrint(description.AsMap()));
-        }
-        else if (description.AsMap().at("type"s) == "Bus"s) {
-            print_.emplace_back(request_handler.BusInfoPrint(description.AsMap()));
-        }
-        else if (description.AsMap().at("type"s) == "Map"s) {
-            print_.emplace_back(request_handler.MapPrint(description.AsMap().at("id"s).AsInt(), map_svg));
-        }
-    }
-}
 
 void JsonReader::ResultPrint() {
     Print(Document{ print_ }, output_);

@@ -15,6 +15,8 @@ namespace request_handler {
     public:
         RequestHandler(const transport_catalogue::TransportCatalogue& catalog, const map_renderer::MapRender& map_catalog);
 
+        void RequestProcess(json::Array& value, svg::Document& map_svg, json::Array& print);
+
         json::Dict StopInfoPrint(const json::Dict& value);
         json::Dict BusInfoPrint(const json::Dict& value);
         json::Dict MapPrint(int id, svg::Document& map_svg);
