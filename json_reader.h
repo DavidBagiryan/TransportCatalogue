@@ -5,17 +5,15 @@
 namespace json_reader {
     class JsonReader {
     public:
-        JsonReader(std::ostringstream& output)
+        JsonReader(std::ostream& output)
             : output_(output)
         {
         }
-
+        
         void Reader();
-
-        std::ostringstream& Result();
-
+        
     private:
-        std::ostringstream& output_;
+        std::ostream& output_;
 
         transport_catalogue::TransportCatalogue catalog_;
         json::Array print_;
@@ -29,7 +27,5 @@ namespace json_reader {
         ////////// render_settings //////////
         map_renderer::RenderSettings SetSettingsMap(json::Dict& render_settings);
         const svg::Color GetColor(const json::Node& color);
-
-        void ResultPrint();
     };
-} // конец пространства имен json_reader
+} // namespace json_reader

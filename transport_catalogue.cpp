@@ -7,7 +7,7 @@ using namespace transport_catalogue;
 // добавление остановки
 void TransportCatalogue::AddStop(std::string name, Coordinates point) {
 	stops_.emplace_back(name, point);
-	buses_to_stops_[name];
+	buses_to_stops_[stops_.back().name_];
 }
 
 size_t TransportCatalogue::StopsHasher::operator()(const std::pair<const Stop*, const Stop*>& two_stops) const {
@@ -16,7 +16,7 @@ size_t TransportCatalogue::StopsHasher::operator()(const std::pair<const Stop*, 
 	return h_2 * 42 + h_1 * (42 * 42);
 }
 
-// добавление маршрута
+// добавление маршрутая
 void TransportCatalogue::AddBus(std::string name, std::vector<const Stop*> stops_of_bus, RouteType loop) {
 	buses_.emplace_back(name, stops_of_bus, loop );
 	const Bus* from_buses_ = &FindBus(name);

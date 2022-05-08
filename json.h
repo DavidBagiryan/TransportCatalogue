@@ -19,7 +19,7 @@ namespace json {
 		using runtime_error::runtime_error;
 	};
 
-	class Node : private Variable {
+	class Node final : private Variable {
 	public:
 		using variant::variant;
 

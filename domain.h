@@ -48,4 +48,4 @@ namespace domain {
 		double real_distance_length_;
 		double curvature_;
 	};
-}// конец пространства имен domain
+} // namespaceн domain

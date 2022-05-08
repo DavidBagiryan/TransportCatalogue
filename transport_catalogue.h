@@ -68,4 +68,4 @@ namespace transport_catalogue {
 		// подсчет длины маршурута 
 		std::pair<double, double> GetBusInfoLoopDistance(Bus& bus, double& looped_coeff);
 	};
-} // конец пространства имен transport_catalogue
+} // namespace transport_catalogue

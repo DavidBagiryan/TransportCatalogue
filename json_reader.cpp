@@ -30,8 +30,7 @@ void JsonReader::Reader() {
     }
 
     request_handler::RequestHandler processing(catalog_, map_catalog_);
-    processing.RequestProcess(content_state, map_svg, print_);
-    ResultPrint();
+    processing.RequestProcess(content_state, map_svg, output_);
 }
 
 ////////// base_requests //////////
@@ -93,14 +92,6 @@ void JsonReader::AddBus(const Dict& bus) {
     catalog_.AddBus(name, stops, is_roundtrip);
 }
 //-------- base_requests //--------
-
-void JsonReader::ResultPrint() {
-    Print(Document{ print_ }, output_);
-}
-
-std::ostringstream& JsonReader::Result() {
-    return output_;
-}
 
 ////////// render_settings //////////
 RenderSettings JsonReader::SetSettingsMap(Dict& render_settings) {

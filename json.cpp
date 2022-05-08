@@ -193,6 +193,7 @@ namespace json {
         }
 
     }  // namespace
+
     ///////////////////////////////////////
 
     bool Node::IsNull() const {
@@ -265,87 +266,128 @@ namespace json {
         return root_;
     }
 
-    Document Load(istream& input) {
-        return Document{ LoadNode(input) };
+    // структура для создания отступов
+    struct PrintContext {
+        std::ostream& out;
+        int indent_step = 4;
+        int indent = 0;
+        
+        void PrintIndent() const {
+            for (int i = 0; i < indent; ++i) {
+                out.put(' ');
+            }
+        }
+        
+        PrintContext Indented() const {
+            return {out, indent_step, indent_step + indent};
+        }
+    };
+    
+    template <typename Value>
+    void PrintValue(const Value& value, const PrintContext& ctx) {
+        ctx.out << value;
+    }
+    void PrintNode(const Node& value, const PrintContext& ctx);
+    
+    void PrintString(const std::string& value, std::ostream& out) {
+    out.put('"');
+        for (const char c : value) {
+            switch (c) {
+                case '\r':
+                    out << "\\r"sv;
+                    break;
+                case '\n':
+                    out << "\\n"sv;
+                    break;
+                case '"':
+                    // Символы " и \ выводятся как \" или \\, соответственно
+                    [[fallthrough]];
+                case '\\':
+                    out.put('\\');
+                    [[fallthrough]];
+                default:
+                    out.put(c);
+                    break;
+            }
+        }
+        out.put('"');
+    }
+
+    template <>
+    void PrintValue<std::string>(const std::string& value, const PrintContext& ctx) {
+        PrintString(value, ctx.out);
+    }
+
+    template <>
+    void PrintValue<std::nullptr_t>(const std::nullptr_t&, const PrintContext& ctx) {
+        ctx.out << "null"sv;
+    }
+
+    // В специализаци шаблона PrintValue для типа bool параметр value передаётся
+    // по константной ссылке, как и в основном шаблоне.
+    // В качестве альтернативы можно использовать перегрузку:
+    // void PrintValue(bool value, const PrintContext& ctx);
+    template <>
+    void PrintValue<bool>(const bool& value, const PrintContext& ctx) {
+        ctx.out << (value ? "true"sv : "false"sv);
+    }
+
+    template <>
+    void PrintValue<Array>(const Array& nodes, const PrintContext& ctx) {
+        std::ostream& out = ctx.out;
+        out << "[\n"sv;
+        bool first = true;
+        auto inner_ctx = ctx.Indented();
+        for (const Node& node : nodes) {
+            if (first) {
+                first = false;
+            } else {
+                out << ",\n"sv;
+            }
+            inner_ctx.PrintIndent();
+            PrintNode(node, inner_ctx);
+        }
+        out.put('\n');
+        ctx.PrintIndent();
+        out.put(']');
+    }
+
+    template <>
+    void PrintValue<Dict>(const Dict& nodes, const PrintContext& ctx) {
+        std::ostream& out = ctx.out;
+        out << "{\n"sv;
+        bool first = true;
+        auto inner_ctx = ctx.Indented();
+        for (const auto& [key, node] : nodes) {
+            if (first) {
+                first = false;
+            } else {
+                out << ",\n"sv;
+            }
+            inner_ctx.PrintIndent();
+            PrintString(key, ctx.out);
+            out << ": "sv;
+            PrintNode(node, inner_ctx);
+        }
+        out.put('\n');
+        ctx.PrintIndent();
+        out.put('}');
+    }
+
+    void PrintNode(const Node& node, const PrintContext& ctx) {
+        std::visit(
+            [&ctx](const auto& value) {
+                PrintValue(value, ctx);
+            },
+            node.GetNode());
+    }
+
+    Document Load(std::istream& input) {
+        return Document{LoadNode(input)};
     }
 
     void Print(const Document& doc, std::ostream& output) {
-        auto root = doc.GetRoot();
-        if (root.IsNull()) {
-            output << "null"s;
-            return;
-        }
-        if (root.IsInt()) {
-            output << root.AsInt();
-            return;
-        }
-        if (root.IsPureDouble()) {
-            output << root.AsDouble();
-            return;
-        }
-        if (root.IsString()) {
-            std::string text = root.AsString();
-            std::string json_line;
-            for (size_t i = 0; i != text.size(); ++i) {
-                char c = text[i];
-                if (c == '\n') {
-                    json_line += "\\n";
-                    continue;
-                }
-                else if (c == '\r') {
-                    json_line += "\\r";
-                    continue;
-                }
-                else if (c == '\"') {
-                    json_line += "\\\"";
-                    continue;
-                }
-                else if (c == '\t') {
-                    json_line += "\\t";
-                    continue;
-                }
-                else if (c == '\\') {
-                    json_line += "\\\\";
-                    continue;
-                }
-
-                else {
-                    json_line += c;
-                }
-            }
-            output << "\""s << json_line << "\""s;
-            return;
-        }
-        if (root.IsBool()) {
-            root.AsBool() ? output << "true"s : output << "false"s;
-            return;
-        }
-        if (root.IsArray()) {
-            Array vector = root.AsArray();
-            bool f = 0;
-            output << '[';
-            for (size_t j = 0; j < vector.size(); ++j) {
-                if (f == 1) output << ", "s;
-                Print(Document(vector[j]), output);
-                f = 1;
-            }
-            output << ']';
-            return;
-        }
-        if (root.IsMap()) {
-            string word;
-            output << '{' << endl;
-            auto map = root.AsMap();
-            bool f = 0;
-            for (auto& [key, value] : map) {
-                if (f == 1) output << ",\n"s;
-                output << "\""s << key << "\""s << ": "s;
-                Print(Document(value), output);
-                f = 1;
-            }
-            output << '}' << endl;
-            return;
-        }
+        PrintNode(doc.GetRoot(), PrintContext{output});
     }
 
     bool Node::operator==(const Node& right) const {
