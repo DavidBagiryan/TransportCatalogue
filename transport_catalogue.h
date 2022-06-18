@@ -34,11 +34,13 @@ namespace transport_catalogue {
 		// получение всех маршрутов с их остановками
 		std::unordered_map<std::string_view, std::set<std::string_view>>& GetBusesToStops();
 		// получение информации о дистанции между остановками
-		double GetDistanceBetweenStops(std::string stop_name, std::string next_stop_name);
-		double GetDistanceBetweenStops(const Stop* stop, const Stop* next_stop);
+		double GetDistanceBetweenStops(const std::string& stop_name, const std::string& next_stop_name);
+		double GetDistanceBetweenStops(const Stop* stop, const Stop* next_stop) const;
 
 		// получение доступа к маршрутам
 		const std::deque<const Bus*> GetBuses() const;
+		// получение доступа к остановкам
+		const std::deque<const Stop*> GetStops() const;
 		// получение координат каждой остановки из маршрутов
 		const std::vector<Coordinates> GetAllStopsCoordinates() const;
 

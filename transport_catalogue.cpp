@@ -18,7 +18,7 @@ size_t TransportCatalogue::StopsHasher::operator()(const std::pair<const Stop*, 
 
 // добавление маршрутая
 void TransportCatalogue::AddBus(std::string name, std::vector<const Stop*> stops_of_bus, RouteType loop) {
-	buses_.emplace_back(name, stops_of_bus, loop );
+	buses_.emplace_back(name, stops_of_bus, loop);
 	const Bus* from_buses_ = &FindBus(name);
 	for (const Stop* stop : from_buses_->stops_of_bus_) {
 		buses_to_stops_[stop->name_].insert(from_buses_->name_);
@@ -146,10 +146,10 @@ std::unordered_map<std::string_view, std::set<std::string_view>>& TransportCatal
 }
 
 // получение информации о дистанции между остановками
-double TransportCatalogue::GetDistanceBetweenStops(std::string stop_name, std::string next_stop_name) {
+double TransportCatalogue::GetDistanceBetweenStops(const std::string& stop_name, const std::string& next_stop_name) {
 	return GetDistanceBetweenStops(&FindStop(stop_name), &FindStop(next_stop_name));
 }
-double TransportCatalogue::GetDistanceBetweenStops(const Stop* stop, const Stop* next_stop) {
+double TransportCatalogue::GetDistanceBetweenStops(const Stop* stop, const Stop* next_stop) const {
 	auto stops = std::make_pair(stop, next_stop);
 	double result = 0;
 	if (stop_pair_to_distance_.count(stops)) {
@@ -177,6 +177,14 @@ const std::deque<const Bus*> TransportCatalogue::GetBuses() const {
 		});
 
 	return buses;
+}
+// получение доступа к остановкам
+const std::deque<const Stop*> TransportCatalogue::GetStops() const {
+	std::deque<const Stop*> stops;
+	for (const auto& stop : stops_) {
+		stops.push_back(&stop);
+	}
+	return stops;
 }
 
 // получение координат каждой остановки из маршрутов

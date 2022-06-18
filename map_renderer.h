@@ -35,12 +35,12 @@ namespace map_renderer {
 
         MapRender& SetBuses(const std::deque<const transport_catalogue::Bus*> buses);
         MapRender& SetStopCoordinates(const std::vector<geo::Coordinates> stops_coordinates);
-        MapRender& SetRenderSettings(const RenderSettings& settings);
+        MapRender& SetRenderSettings(const RenderSettings& map_settings);
 
         MapRender& MapRendering(svg::Document& map_svg);
 
     private:
-        RenderSettings settings_;
+        RenderSettings map_settings_;
         std::deque<const transport_catalogue::Bus*> buses_;
         std::vector<const transport_catalogue::Stop*> uniq_stop_;
         std::vector<geo::Coordinates> stops_coordinates_;
